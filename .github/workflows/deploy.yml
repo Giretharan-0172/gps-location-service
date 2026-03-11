@@ -1,0 +1,31 @@
+name: Local Minikube Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: self-hosted  # This tells GitHub to use YOUR laptop
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Ensure Minikube is Running
+        run: |
+          minikube status || minikube start
+
+      - name: Build Docker Image
+        run: |
+          docker build -t gps-app:latest .
+
+      - name: Sideload Image to Minikube
+        run: |
+          minikube image load gps-app:latest
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f gps.yaml
+          # Force a restart to use the fresh image
+          kubectl rollout restart deployment/gps-deployment
