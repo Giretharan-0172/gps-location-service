@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gps-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gps
+  template:
+    metadata:
+      labels:
+        app: gps
+    spec:
+      containers:
+      - name: gps-container
+        image: gps-app:v1
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gps-service
+spec:
+  type: ClusterIP
+  selector:
+    app: gps
+  ports:
+  - port: 5000
+    targetPort: 5000
